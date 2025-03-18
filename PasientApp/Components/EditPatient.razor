@@ -4,12 +4,12 @@
     <QuickGrid Items="@Patient.Conditions.AsQueryable()">
         <PropertyColumn Property="@(condition => condition)" Title="Condition"></PropertyColumn>
         <TemplateColumn Context="deleteCondition">
-            <button class="btn btn-dark" type="button" @onclick="()=>RemoveCondition(deleteCondition)">Delete</button>
+            <button class="btn btn-outline-danger" type="button" @onclick="()=>RemoveCondition(deleteCondition)">Slett</button>
         </TemplateColumn>
     </QuickGrid>
 
     <InputText @bind-Value="newCondition" placeholder="Add new condition"/>
-    <button class="btn btn-primary" type="button" @onclick="AddCondition">Add</button>
+    <button class="btn btn-primary" type="button" @onclick="AddCondition">Legg til</button>
 </EditForm>
 
 @code {
@@ -18,9 +18,11 @@
 
     private void AddCondition()
     {
-        if (Patient.Conditions.Contains(newCondition) == false)
+        if (Patient.Conditions.Contains(newCondition) == false
+            && newCondition.Length > 0)
         {
             Patient.Conditions.Add(newCondition);
+            newCondition = "";
         }
     }
 

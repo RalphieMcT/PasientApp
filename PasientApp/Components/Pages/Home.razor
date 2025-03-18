@@ -2,8 +2,7 @@
 @using System.Diagnostics;
 @using PasientApp.Models
 
-
-<button class="btn btn-dark" type="button" @onclick="OpenForm">Ny Pasient</button>
+<button class="btn btn-primary" type="button" @onclick="OpenForm">Ny Pasient</button>
 <QuickGrid Items="@filteredPatients">
     <PropertyColumn IsDefaultSortColumn="true" Property="@(x => x.Id)">
         <ColumnOptions>
@@ -28,8 +27,8 @@
     </TemplateColumn>
 
     <TemplateColumn Context="patient">
-        <button class="btn btn-dark" type="button" @onclick="()=>EditPatient(patient)">Edit</button>
-        <button class="btn btn-dark" type="button" @onclick="()=>DeletePatient(patient)">Delete</button>
+        <button class="btn btn-dark" type="button" @onclick="()=>EditPatient(patient)">Endre Tilstander</button>
+        <button class="btn btn-outline-danger" type="button" @onclick="()=>DeletePatient(patient)">Slett</button>
     </TemplateColumn>
 </QuickGrid>
 
@@ -38,7 +37,7 @@
     <div class="modal-overlay">
         <div class="modal-box">
             <AddPatient OnPatientAdded="AddPatientToList"></AddPatient>
-            <button class="close-btn" @onclick="CloseForm">Close</button>
+            <button class="close-btn btn-dark" @onclick="CloseForm">Lukk</button>
         </div>
     </div>
 }
@@ -48,7 +47,7 @@
     <div class="modal-overlay">
         <div class="modal-box">
             <EditPatient Patient="selectedPatient"></EditPatient>
-            <button class="close-btn" @onclick="CloseEditForm">Close</button>
+            <button class="close-btn btn-dark" @onclick="CloseEditForm">Lukk</button>
         </div>
     </div>
 }

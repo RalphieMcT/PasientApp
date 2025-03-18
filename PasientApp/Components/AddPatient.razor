@@ -19,7 +19,7 @@
 @code {
     [Parameter] public EventCallback<Patient> OnPatientAdded { get; set; }
 
-    [SupplyParameterFromForm]
+  //  [SupplyParameterFromForm]
     private Patient? Model { get; set; }
 
     protected override void OnInitialized() => Model ??= new();
