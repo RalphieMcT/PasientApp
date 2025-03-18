@@ -1,0 +1,33 @@
+﻿@using PasientApp.Models
+
+<EditForm Model="Patient">
+    <QuickGrid Items="@Patient.Conditions.AsQueryable()">
+        <PropertyColumn Property="@(condition => condition)" Title="Condition"></PropertyColumn>
+        <TemplateColumn Context="deleteCondition">
+            <button class="btn btn-dark" type="button" @onclick="()=>RemoveCondition(deleteCondition)">Delete</button>
+        </TemplateColumn>
+    </QuickGrid>
+
+    <InputText @bind-Value="newCondition" placeholder="Add new condition"/>
+    <button class="btn btn-primary" type="button" @onclick="AddCondition">Add</button>
+</EditForm>
+
+@code {
+    [Parameter] public Patient Patient { get; set; } = new Patient();
+    string newCondition = "";
+
+    private void AddCondition()
+    {
+        if (Patient.Conditions.Contains(newCondition) == false)
+        {
+            Patient.Conditions.Add(newCondition);
+        }
+    }
+
+    private void RemoveCondition(string condition)
+    {
+        Patient.Conditions.Remove(condition);
+        newCondition = "";
+    }
+
+}

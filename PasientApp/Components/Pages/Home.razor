@@ -1,7 +1,155 @@
 ﻿@page "/"
+@using System.Diagnostics;
+@using PasientApp.Models
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<button class="btn btn-dark" type="button" @onclick="OpenForm">Ny Pasient</button>
+<QuickGrid Items="@filteredPatients">
+    <PropertyColumn IsDefaultSortColumn="true" Property="@(x => x.Id)">
+        <ColumnOptions>
+            <div class="search-box">
+                <input type="search" autofocus @bind="idFilter" @bind:event="oninput" placeholder="Søk etter id" />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="@(x => x.Name)" Title="Navn"> 
+        <ColumnOptions>
+            <div class="search-box">
+                <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Søk etter navn" />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="@(x => DateOfBirthToAge(x.DateOfBirth))" Title="Alder" />
+    <TemplateColumn Context="patientconditions" Title="Tilstander">
+        @if (patientconditions.Conditions != null && patientconditions.Conditions.Count > 0)
+        {
+            <div>@patientconditions.Conditions.Count</div>
+        }
+    </TemplateColumn>
 
-Welcome to your new app.
+    <TemplateColumn Context="patient">
+        <button class="btn btn-dark" type="button" @onclick="()=>EditPatient(patient)">Edit</button>
+        <button class="btn btn-dark" type="button" @onclick="()=>DeletePatient(patient)">Delete</button>
+    </TemplateColumn>
+</QuickGrid>
+
+@if (showForm)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <AddPatient OnPatientAdded="AddPatientToList"></AddPatient>
+            <button class="close-btn" @onclick="CloseForm">Close</button>
+        </div>
+    </div>
+}
+
+@if (showEditForm)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <EditPatient Patient="selectedPatient"></EditPatient>
+            <button class="close-btn" @onclick="CloseEditForm">Close</button>
+        </div>
+    </div>
+}
+
+@code {
+    List<Patient> patients = new List<Patient>();
+    Patient selectedPatient = null;
+    private bool showForm = false;
+    private bool showEditForm = false;
+    string nameFilter = "";
+    int idFilter = 0;
+
+    IQueryable<Patient> filteredPatients
+    {
+        get
+        {
+            IEnumerable<Patient> result = patients;
+            if (nameFilter.Length > 0)
+            {
+                result = patients?.Where(x => x.Name.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+            }
+            if (idFilter > 0)
+            {
+                result = patients?.Where(x => x.Id == idFilter);
+            }
+            return result.AsQueryable();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        patients.Add(new Patient { Id = 1, Name = "Navnesen", DateOfBirth = new DateTime(1991, 03, 17), Conditions = new List<string> { "123", "321" } });
+        patients.Add(new Patient { Id = 2, Name = "Hansen", DateOfBirth = new DateTime(1985, 8, 8) });
+    }
+
+    int DateOfBirthToAge(DateTime? dateTime)
+    {
+        if (dateTime is null)
+            return 0;
+
+        DateTime dt = dateTime.Value;
+        int age = DateTime.Now.Year - dt.Year - (dt.DayOfYear <= DateTime.Now.DayOfYear ? 0 : 1);
+        return age;
+    }
+
+    private void AddPatientToList(Models.Patient patient)
+    {
+        if (patient.Id == 0)
+        {
+            if (patients.Count == 0)
+            {
+                patient.Id = 1;
+            }
+            else
+            {
+                patient.Id = patients.Select(x => x.Id).Max() + 1;
+            }
+        }
+        patients.Add(patient);
+        CloseForm();
+    }
+
+    private void OpenForm()
+    {
+        showForm = true;
+        Console.WriteLine($"showForm is now: {showForm}");
+        StateHasChanged();
+    }
+
+    public void CloseForm()
+    {
+        showForm = false;
+        Console.WriteLine($"showForm is now: {showForm}");
+        StateHasChanged();
+    }
+
+    public void CloseEditForm()
+    {
+        showEditForm = false;
+        selectedPatient = null;
+        Console.WriteLine($"showEditForm is now: {showEditForm}");
+        StateHasChanged();
+    }
+
+    private void HandleValidSubmit()
+    {
+        showForm = false;
+        Console.WriteLine($"showForm is now: {showForm}");
+        StateHasChanged();
+    }
+
+    private void DeletePatient(Patient patient)
+    {
+        patients.Remove(patient);
+    }
+
+    private void EditPatient(Patient patient)
+    {
+        selectedPatient = patient;
+        showEditForm = true;
+        StateHasChanged();
+    }
+
+}
